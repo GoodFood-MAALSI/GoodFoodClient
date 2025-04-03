@@ -1,8 +1,14 @@
 import { Users } from "src/domain/users/entities/user.entity";
-import { CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class UserFavoriteRestaurant {
+        @PrimaryGeneratedColumn()
+            id: number;
+        
+        @Column()
+        restaurant_id: number;
+
         @CreateDateColumn()
         createdAt: Date;
 
