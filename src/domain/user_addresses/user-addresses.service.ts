@@ -4,45 +4,60 @@ import { UpdateUserAddressDto } from './dto/update-user-address.dto';
 import { UserAddress } from './entities/user-address.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { User } from 'src/domain/users/entities/user.entity';
 
 @Injectable()
 export class UserAddressesService {
   constructor(
-        @InjectRepository(UserAddress)
-        private readonly userAddressRepository: Repository<UserAddress>,
-      ) {}
-    
-      async create(createuserAddressDto: CreateUserAddressDto) {
-        const userAddress = this.userAddressRepository.create(createuserAddressDto)
-        return await this.userAddressRepository.save(userAddress);
-      }
-    
-      async findAll() {
-        return await this.userAddressRepository.find();
-      }
-    
-      async findOne(id: number) {
-        return await this.userAddressRepository.findOne({ where: {id}});
-      }
-    
-      async update(id: number, updateuserAddressDto: UpdateUserAddressDto) {
-    
-        const userAddress = await this.findOne(id);
-    
-        if(!userAddress){
-          throw new NotFoundException();
-        }
-    
-        Object.assign(userAddress,updateuserAddressDto);
-        return await this.userAddressRepository.save(userAddress);
-      }
-    
-      async remove(id: number) {
-        const userAddress = await this.findOne(id);
-    
-        if(!userAddress){
-          throw new NotFoundException();
-        }
-        return await this.userAddressRepository.remove(userAddress);
-      }
+    @InjectRepository(UserAddress)
+    private readonly userAddressRepository: Repository<UserAddress>,
+    @InjectRepository(User) 
+    private readonly userRepository: Repository<User>,
+  ) {}
+
+  async create(
+    createUserAddressDto: CreateUserAddressDto,
+  ): Promise<UserAddress> {
+    const { userId, ...addressData } = createUserAddressDto;
+
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException('Utilisateur non trouvé');
+    }
+
+    const userAddress = this.userAddressRepository.create({
+      ...addressData,
+      user,
+    });
+    return await this.userAddressRepository.save(userAddress);
+  }
+
+  async findAll(): Promise<UserAddress[]> {
+    return await this.userAddressRepository.find({ relations: ['user'] });
+  }
+
+  async findOne(id: number): Promise<UserAddress> {
+    const userAddress = await this.userAddressRepository.findOne({
+      where: { id },
+      relations: ['user'],
+    });
+    if (!userAddress) {
+      throw new NotFoundException('Adresse non trouvée');
+    }
+    return userAddress;
+  }
+
+  async update(
+    id: number,
+    updateUserAddressDto: UpdateUserAddressDto,
+  ): Promise<UserAddress> {
+    const userAddress = await this.findOne(id);
+    Object.assign(userAddress, updateUserAddressDto);
+    return await this.userAddressRepository.save(userAddress);
+  }
+
+  async remove(id: number): Promise<void> {
+    const userAddress = await this.findOne(id);
+    await this.userAddressRepository.remove(userAddress);
+  }
 }

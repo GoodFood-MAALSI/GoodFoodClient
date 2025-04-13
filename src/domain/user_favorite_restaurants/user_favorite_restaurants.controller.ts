@@ -1,15 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Request, UseGuards } from '@nestjs/common';
 import { UserFavoriteRestaurantsService } from './user_favorite_restaurants.service';
 import { CreateUserFavoriteRestaurantDto } from './dto/create-user_favorite_restaurant.dto';
 import { UpdateUserFavoriteRestaurantDto } from './dto/update-user_favorite_restaurant.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('user-favorite-restaurants')
 export class UserFavoriteRestaurantsController {
   constructor(private readonly userFavoriteRestaurantsService: UserFavoriteRestaurantsService) {}
 
   @Post()
-  create(@Body() createUserFavoriteRestaurantDto: CreateUserFavoriteRestaurantDto) {
-    return this.userFavoriteRestaurantsService.create(createUserFavoriteRestaurantDto);
+  @UseGuards(AuthGuard('jwt'))
+  create(@Body() createUserFavoriteRestaurantDto: CreateUserFavoriteRestaurantDto, @Request() req) {
+    const userId = req.user.id;
+    return this.userFavoriteRestaurantsService.create({ ...createUserFavoriteRestaurantDto, userId });
   }
 
   @Get()
@@ -20,11 +23,6 @@ export class UserFavoriteRestaurantsController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.userFavoriteRestaurantsService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserFavoriteRestaurantDto: UpdateUserFavoriteRestaurantDto) {
-    return this.userFavoriteRestaurantsService.update(+id, updateUserFavoriteRestaurantDto);
   }
 
   @Delete(':id')

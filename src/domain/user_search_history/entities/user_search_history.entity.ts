@@ -1,5 +1,5 @@
-import { Users } from "src/domain/users/entities/user.entity";
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { User } from 'src/domain/users/entities/user.entity';
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class UserSearchHistory {
@@ -10,8 +10,8 @@ export class UserSearchHistory {
     search_query: string;
 
     @CreateDateColumn()
-    createdAt: Date;
+    created_at: Date;
 
-    @ManyToOne(() => Users, user => user.userSearchHistory) // Relation ManyToOne avec User
-    user: Users;
+    @ManyToOne(() => User, user => user.userSearchHistory)
+    user: User;
 }

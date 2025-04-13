@@ -1,17 +1,17 @@
-import { Users } from "src/domain/users/entities/user.entity";
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { User } from 'src/domain/users/entities/user.entity';
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class UserFavoriteRestaurant {
-        @PrimaryGeneratedColumn()
-            id: number;
-        
-        @Column()
-        restaurant_id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-        @CreateDateColumn()
-        createdAt: Date;
+  @Column()
+  restaurant_id: number;
 
-        @ManyToOne(() => Users, user => user.userFavoriteRestaurants) // Relation ManyToOne avec User
-        user: Users;
+  @CreateDateColumn()
+  created_at: Date;
+
+  @ManyToOne(() => User, user => user.userFavoriteRestaurants)
+  user: User;
 }

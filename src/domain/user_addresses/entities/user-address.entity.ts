@@ -1,18 +1,13 @@
-
-import { Users } from 'src/domain/users/entities/user.entity';
+import { User } from 'src/domain/users/entities/user.entity';
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne } from 'typeorm';
-
 
 @Entity()
 export class UserAddress {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Users, user => user.userAddress) // Relation ManyToOne avec User
-  user: Users;
-
-  @Column()
-  user_id: number; // Clé étrangère
+  @ManyToOne(() => User, user => user.userAddresses)
+  user: User;
 
   @Column()
   street_number: string;

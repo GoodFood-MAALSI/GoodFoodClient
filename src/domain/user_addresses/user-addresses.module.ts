@@ -3,10 +3,13 @@ import { UserAddressesService } from './user-addresses.service';
 import { UserAddressesController } from './user-addresses.controller';
 import { UserAddress } from './entities/user-address.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { DatabaseModule } from 'src/database/databas.module';
+import { UsersModule } from 'src/domain/users/users.module';
 
 @Module({
-  imports: [DatabaseModule,TypeOrmModule.forFeature([UserAddress])],
+  imports: [
+    TypeOrmModule.forFeature([UserAddress]),
+    UsersModule,
+  ],
   controllers: [UserAddressesController],
   providers: [UserAddressesService],
 })
