@@ -1,17 +1,14 @@
 import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import * as dotenv from 'dotenv';
-
-dotenv.config(); // Charge le fichier .env en tout début
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // Activer CORS avec les bonnes options
   app.enableCors({
-    origin: [process.env.FRONTEND_DOMAIN],
+    origin: '*',
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
@@ -20,7 +17,6 @@ async function bootstrap() {
   // Pipe de validation global
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
-  // Swagger configuration
   const swaggerConfig = new DocumentBuilder()
     .setTitle('API Documentation')
     .setDescription("Documentation de l'API NestJS avec Swagger")
@@ -32,15 +28,30 @@ async function bootstrap() {
     .addTag("UserAddresses", "Gestion des adresses des utilisateurs : création, récupération, mise à jour et suppression des adresses")
     .addTag("UserFavoriteRestaurants", "Gestion des restaurants favoris des utilisateurs : ajout, récupération et suppression des restaurants préférés")
     .addTag("Reviews", "Gestion des avis des utilisateurs : création, récupération, mise à jour et suppression des reviews")
-    .addServer(process.env.BACKEND_DOMAIN, 'Local dev')
     .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);
+  document.servers = [
+    {
+      url: '{protocol}://{host}/client/api',
+      description: 'Dynamic Server URL',
+      variables: {
+        protocol: {
+          default: 'http',
+          enum: ['http', 'https'],
+          description: 'Protocol used (http or https)',
+        },
+        host: {
+          default: 'localhost:8080',
+          description: 'Host of the API (replace with your IP or domain)',
+        },
+      },
+    },
+  ];
+
   SwaggerModule.setup('swagger', app, document);
 
-  // Démarrage du serveur
   await app.listen(process.env.APP_PORT);
 }
-
 bootstrap();
