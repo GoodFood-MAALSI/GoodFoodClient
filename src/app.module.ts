@@ -15,8 +15,6 @@ import { UserAddressesModule } from './domain/user_addresses/user-addresses.modu
 import { UserFavoriteRestaurantsModule } from './domain/user_favorite_restaurants/user_favorite_restaurants.module';
 import { ReviewsModule } from './domain/reviews/reviews.module';
 import { DatabaseModule } from './database/databas.module';
-import { ClientsModule, Transport } from '@nestjs/microservices';
-import { ClientOrdersModule } from './domain/client-orders/client-orders.module';
 
 @Module({
   imports: [
@@ -31,8 +29,7 @@ import { ClientOrdersModule } from './domain/client-orders/client-orders.module'
     UserSearchHistoryModule,
     UserAddressesModule,
     UserFavoriteRestaurantsModule,
-    ReviewsModule,
-    ClientOrdersModule
+    ReviewsModule
   ],
   controllers: [AppController],
   providers: [AppService],
