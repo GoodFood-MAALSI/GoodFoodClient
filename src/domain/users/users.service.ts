@@ -2,15 +2,18 @@ import { Injectable, HttpException, HttpStatus } from "@nestjs/common";
 import { DeepPartial, Repository } from "typeorm";
 import { User } from "./entities/user.entity";
 import { InjectRepository } from "@nestjs/typeorm";
-import { CreateUserDto } from "./dtos/create-user.dto";
 import { EntityCondition } from "src/domain/utils/types/entity-condition.type";
 import { NullableType } from "src/domain/utils/types/nullable.type";
+import { Session } from "../session/entities/session.entity";
+import { CreateUserDto } from "./dtos/create-user.dto";
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
+    @InjectRepository(Session)
+    private readonly sessionRepository: Repository<Session>,
   ) {}
 
   async createUser(createUserDto: CreateUserDto): Promise<User> {
@@ -38,8 +41,15 @@ export class UsersService {
     );
   }
 
-  async deleteUser(id: User["id"]): Promise<void> {
+  async deleteUser(id: User["id"]): Promise<{ message: string }> {
+    const user = await this.usersRepository.findOne({ where: { id } });
+    if (!user) throw new HttpException("User not found", HttpStatus.NOT_FOUND);
+
+    // TODO:Ajouter tout les liens au client
+    await this.sessionRepository.delete({ user: { id } });
     await this.usersRepository.delete(id);
+
+    return { message: "L'utilisateur a été supprimé avec succès" };
   }
 
   async saveUser(user: User): Promise<User> {
