@@ -8,6 +8,7 @@ import {
   UseGuards,
   HttpException,
   HttpStatus,
+  Request,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import {
@@ -21,6 +22,7 @@ import { UpdateUserDto } from './dtos/update-user.dto';
 import { JwtPayloadType } from '../auth/strategies/types/jwt-payload.type';
 import { User as UserDecorator } from './decorators/user.decorator';
 import { User } from './entities/user.entity';
+import * as jwt from 'jsonwebtoken';
 
 @ApiTags('Users')
 @Controller('users')
@@ -127,8 +129,6 @@ export class UsersController {
     @UserDecorator() currentUser: JwtPayloadType,
   ): Promise<{ message: string }> {
     const userId = +id;
-    console.log('User ID from param:', userId);
-    console.log('Current user:', currentUser);
 
     if (!currentUser?.id) {
       throw new HttpException(
@@ -148,5 +148,52 @@ export class UsersController {
     if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
 
     return this.usersService.deleteUser(userId);
+  }
+
+  @Get('/verify/:userId')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @ApiOperation({ summary: 'Vérifier un utilisateur pour les appels inter-services' })
+  @ApiResponse({ status: 200, description: 'Utilisateur vérifié' })
+  @ApiResponse({ status: 401, description: 'Non autorisé' })
+  @ApiResponse({ status: 403, description: 'Rôle invalide' })
+  @ApiResponse({ status: 404, description: 'Utilisateur non trouvé' })
+  async verifyClient(@Param('userId') userId: string, @Request() req) {
+
+    // Récupérer le token depuis l'en-tête Authorization
+    const token = req.headers['authorization']?.split(' ')[1];
+    if (!token) {
+      throw new HttpException('Token manquant', HttpStatus.UNAUTHORIZED);
+    }
+
+    try {
+      // Valider le token avec la clé secrète
+      let decoded: any = null;
+      const secret = process.env.AUTH_JWT_SECRET;
+      decoded = jwt.verify(token, secret);
+      const authUserId = decoded.id?.toString();
+      const authRole = decoded.role;
+
+      if (!authUserId || !authRole) {
+        throw new HttpException('ID ou rôle manquant dans le token', HttpStatus.UNAUTHORIZED);
+      }
+
+      if (authRole !== 'client') {
+        throw new HttpException('Rôle invalide', HttpStatus.FORBIDDEN);
+      }
+
+      if (userId !== authUserId) {
+        throw new HttpException('Utilisateur non autorisé', HttpStatus.FORBIDDEN);
+      }
+
+      const user = await this.usersService.findOneUser({ id: +userId });
+      if (!user) {
+        throw new HttpException('Utilisateur non trouvé', HttpStatus.NOT_FOUND);
+      }
+
+      return { message: 'Client vérifié' };
+    } catch (err) {
+      throw new HttpException('Erreur de validation du token', HttpStatus.UNAUTHORIZED);
+    }
   }
 }
