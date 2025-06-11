@@ -4,6 +4,7 @@ import { UserAddressesController } from './user-addresses.controller';
 import { UserAddress } from './entities/user-address.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from 'src/domain/users/users.module';
+import { IsEntityExistsConstraint } from '../utils/validators/is-entity-exists.validator';
 
 @Module({
   imports: [
@@ -11,6 +12,6 @@ import { UsersModule } from 'src/domain/users/users.module';
     UsersModule,
   ],
   controllers: [UserAddressesController],
-  providers: [UserAddressesService],
+  providers: [IsEntityExistsConstraint, UserAddressesService],
 })
 export class UserAddressesModule {}

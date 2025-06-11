@@ -1,21 +1,21 @@
-import { IsString, IsNotEmpty, IsBoolean, IsOptional } from '@nestjs/class-validator';
-import { IsNumber } from 'class-validator';
+import { IsString, IsNotEmpty } from '@nestjs/class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateUserAddressDto {
+
   @ApiProperty({
-    description: "L'identifiant de l'utilisateur associé à cette adresse",
-    example: 1,
-    type: Number,
+    description: 'Intitulé de l\'adresse',
+    example: 'Travail',
+    type: String
   })
   @IsNotEmpty()
-  @IsNumber()
-  userId: number;
+  @IsString()
+  name: string;
 
   @ApiProperty({
     description: 'Le numéro de la rue (ex. "12bis")',
     example: '12bis',
-    type: String,
+    type: String
   })
   @IsNotEmpty()
   @IsString()
@@ -24,7 +24,7 @@ export class CreateUserAddressDto {
   @ApiProperty({
     description: 'Le nom de la rue',
     example: 'Rue des Lilas',
-    type: String,
+    type: String
   })
   @IsNotEmpty()
   @IsString()
@@ -33,7 +33,7 @@ export class CreateUserAddressDto {
   @ApiProperty({
     description: 'La ville',
     example: 'Paris',
-    type: String,
+    type: String
   })
   @IsNotEmpty()
   @IsString()
@@ -56,14 +56,4 @@ export class CreateUserAddressDto {
   @IsNotEmpty()
   @IsString()
   country: string;
-
-  @ApiProperty({
-    description: "Indique si cette adresse est l'adresse par défaut de l'utilisateur",
-    example: true,
-    type: Boolean,
-    required: false,
-  })
-  @IsOptional()
-  @IsBoolean()
-  is_default: boolean;
 }

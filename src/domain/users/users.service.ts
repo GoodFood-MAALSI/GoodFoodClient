@@ -6,6 +6,7 @@ import { EntityCondition } from "src/domain/utils/types/entity-condition.type";
 import { NullableType } from "src/domain/utils/types/nullable.type";
 import { Session } from "../session/entities/session.entity";
 import { CreateUserDto } from "./dtos/create-user.dto";
+import { UserAddress } from "../user_addresses/entities/user-address.entity";
 
 @Injectable()
 export class UsersService {
@@ -14,6 +15,8 @@ export class UsersService {
     private readonly usersRepository: Repository<User>,
     @InjectRepository(Session)
     private readonly sessionRepository: Repository<Session>,
+    @InjectRepository(UserAddress)
+    private readonly userAddressesRepository: Repository<UserAddress>,
   ) {}
 
   async createUser(createUserDto: CreateUserDto): Promise<User> {
@@ -46,6 +49,7 @@ export class UsersService {
     if (!user) throw new HttpException("User not found", HttpStatus.NOT_FOUND);
 
     // TODO:Ajouter tout les liens au client
+    await this.userAddressesRepository.delete({ user: { id } });
     await this.sessionRepository.delete({ user: { id } });
     await this.usersRepository.delete(id);
 

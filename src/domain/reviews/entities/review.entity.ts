@@ -20,8 +20,4 @@ export class Review {
 
   @UpdateDateColumn()
   updated_at: Date;
-
-  @ManyToOne(() => User, (user) => user.reviews, { nullable: false })
-  @JoinColumn({ name: "user_id" })
-  get_user: User;
 }

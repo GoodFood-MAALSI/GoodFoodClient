@@ -4,9 +4,12 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { ResponseInterceptor } from './domain/utils/interceptors/response.interceptor';
 import { AllExceptionsFilter } from './domain/utils/filters/http-exception.filter';
+import { useContainer } from 'class-validator';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
   // Activer CORS avec les bonnes options
   app.enableCors({
@@ -17,7 +20,13 @@ async function bootstrap() {
   });
   
   // Pipe de validation global
-  app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+      forbidUnknownValues: false,
+    }),
+  );
 
   // Format des réponses/exceptions
   app.useGlobalInterceptors(new ResponseInterceptor());
@@ -40,16 +49,11 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   document.servers = [
     {
-      url: '{protocol}://{host}/client/api',
+      url: '{host}',
       description: 'Dynamic Server URL',
       variables: {
-        protocol: {
-          default: 'http',
-          enum: ['http', 'https'],
-          description: 'Protocol used (http or https)',
-        },
         host: {
-          default: 'localhost:8080',
+          default: process.env.BACKEND_DOMAIN,
           description: 'Host of the API (replace with your IP or domain)',
         },
       },

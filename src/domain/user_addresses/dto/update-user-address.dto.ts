@@ -4,11 +4,12 @@ import { ApiPropertyOptional } from "@nestjs/swagger";
 
 export class UpdateUserAddressDto extends PartialType(CreateUserAddressDto) {
   @ApiPropertyOptional({
-    description: "L'identifiant de l'utilisateur associé à cette adresse",
-    example: 1,
-    type: Number,
+    description: 'Intitulé de l\'adresse',
+    example: 'Travail',
+    type: String,
   })
-  userId?: number;
+  name?: string;
+
 
   @ApiPropertyOptional({
     description: 'Le numéro de la rue (ex. "12bis")',
@@ -44,11 +45,4 @@ export class UpdateUserAddressDto extends PartialType(CreateUserAddressDto) {
     type: String,
   })
   country?: string;
-
-  @ApiPropertyOptional({
-    description: "Indique si cette adresse est l'adresse par défaut de l'utilisateur",
-    example: true,
-    type: Boolean,
-  })
-  is_default?: boolean;
 }

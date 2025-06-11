@@ -1,13 +1,13 @@
 import { User } from 'src/domain/users/entities/user.entity';
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
 
 @Entity()
 export class UserAddress {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, user => user.userAddresses)
-  user: User;
+  @Column()
+  name: string;
 
   @Column()
   street_number: string;
@@ -24,8 +24,18 @@ export class UserAddress {
   @Column()
   country: string;
 
-  @Column({ default: false })
-  is_default: boolean;
+  @Column({ type: 'decimal', precision: 15, scale: 8, default: 0 })
+  long: number;
+
+  @Column({ type: 'decimal', precision: 15, scale: 8, default: 0 })
+  lat: number;
+
+  @Column()
+  userId: number;
+
+  @ManyToOne(() => User, (user) => user.userAddress)
+  @JoinColumn({ name: 'userId' })
+  user: User;
 
   @CreateDateColumn()
   created_at: Date;

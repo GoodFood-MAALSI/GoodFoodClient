@@ -11,7 +11,4 @@ export class UserSearchHistory {
 
     @CreateDateColumn()
     created_at: Date;
-
-    @ManyToOne(() => User, user => user.userSearchHistory)
-    user: User;
 }

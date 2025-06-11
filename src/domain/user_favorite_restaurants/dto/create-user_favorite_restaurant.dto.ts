@@ -1,13 +1,15 @@
 import { IsNotEmpty, IsNumber } from "@nestjs/class-validator";
 import { ApiProperty } from "@nestjs/swagger";
+import { User } from "src/domain/users/entities/user.entity";
+import { IsEntityExists } from "src/domain/utils/validators/is-entity-exists.validator";
 
 export class CreateUserFavoriteRestaurantDto {
-  @ApiProperty({
-    description: "L'identifiant de l'utilisateur",
-    example: 1,
-  })
-  @IsNotEmpty()
+  @ApiProperty({ example: 2, description: 'ID du user' })
   @IsNumber()
+  @IsNotEmpty()
+  @IsEntityExists(User, {
+    message: "L'utilisateur n'existe pas",
+  })
   userId: number;
 
   @ApiProperty({
@@ -16,5 +18,5 @@ export class CreateUserFavoriteRestaurantDto {
   })
   @IsNotEmpty()
   @IsNumber()
-  restaurant_id: number;
+  restaurantId: number;
 }

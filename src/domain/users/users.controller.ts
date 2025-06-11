@@ -103,12 +103,7 @@ export class UsersController {
       userId,
       updateUserDto,
     );
-    return {
-      id: updatedUser.id,
-      first_name: updatedUser.first_name,
-      last_name: updatedUser.last_name,
-      updated_at: updatedUser.updated_at,
-    };
+    return updatedUser;
   }
 
   @Delete(':id')

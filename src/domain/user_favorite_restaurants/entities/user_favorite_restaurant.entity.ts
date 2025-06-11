@@ -1,5 +1,5 @@
 import { User } from 'src/domain/users/entities/user.entity';
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity()
 export class UserFavoriteRestaurant {
@@ -9,9 +9,16 @@ export class UserFavoriteRestaurant {
   @Column()
   restaurant_id: number;
 
+  @Column()
+  userId: number;
+
   @CreateDateColumn()
   created_at: Date;
 
-  @ManyToOne(() => User, user => user.userFavoriteRestaurants)
+  @UpdateDateColumn()
+  updated_at: Date;
+
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'userId' })
   user: User;
 }

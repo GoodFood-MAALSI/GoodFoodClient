@@ -62,26 +62,38 @@ export class User extends EntityHelper {
   @Column({ type: String, nullable: true })
   last_name: string | null;
 
-  @CreateDateColumn()
-  created_at: Date;
+  @Column({ nullable: true })
+  street_number: string;
+
+  @Column({ nullable: true })
+  street: string;
+
+  @Column({ nullable: true })
+  city: string;
+
+  @Column({ nullable: true })
+  postal_code: string;
+
+  @Column({ nullable: true })
+  country: string;
+
+  @Column({ type: 'decimal', precision: 15, scale: 8, default: 0 })
+  long: number;
+
+  @Column({ type: 'decimal', precision: 15, scale: 8, default: 0 })
+  lat: number;
 
   @Column({ type: String, nullable: true })
   @Index()
   @Exclude({ toPlainOnly: true })
   hash: string | null;
 
+  @CreateDateColumn()
+  created_at: Date;
+
   @UpdateDateColumn()
   updated_at: Date;
 
-  @OneToMany(() => UserSearchHistory, (userSearchHistory) => userSearchHistory.user)
-  userSearchHistory: UserSearchHistory[];
-
   @OneToMany(() => UserAddress, (userAddress) => userAddress.user)
-  userAddresses: UserAddress[];
-
-  @OneToMany(() => UserFavoriteRestaurant, (userFavoriteRestaurant) => userFavoriteRestaurant.user)
-  userFavoriteRestaurants: UserFavoriteRestaurant[];
-
-  @OneToMany(() => Review, (review) => review.get_user)
-  reviews: Review[];
+  userAddress: UserAddress[];
 }

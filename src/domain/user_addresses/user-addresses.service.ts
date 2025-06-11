@@ -11,35 +11,25 @@ export class UserAddressesService {
   constructor(
     @InjectRepository(UserAddress)
     private readonly userAddressRepository: Repository<UserAddress>,
-    @InjectRepository(User) 
+    @InjectRepository(User)
     private readonly userRepository: Repository<User>,
   ) {}
 
   async create(
-    createUserAddressDto: CreateUserAddressDto,
+    createUserAddressDto: CreateUserAddressDto & { userId: number },
   ): Promise<UserAddress> {
     const { userId, ...addressData } = createUserAddressDto;
 
-    const user = await this.userRepository.findOne({ where: { id: userId } });
-    if (!user) {
-      throw new NotFoundException('Utilisateur non trouvé');
-    }
-
     const userAddress = this.userAddressRepository.create({
       ...addressData,
-      user,
+      userId,
     });
     return await this.userAddressRepository.save(userAddress);
-  }
-
-  async findAll(): Promise<UserAddress[]> {
-    return await this.userAddressRepository.find({ relations: ['user'] });
   }
 
   async findOne(id: number): Promise<UserAddress> {
     const userAddress = await this.userAddressRepository.findOne({
       where: { id },
-      relations: ['user'],
     });
     if (!userAddress) {
       throw new NotFoundException('Adresse non trouvée');
@@ -60,4 +50,11 @@ export class UserAddressesService {
     const userAddress = await this.findOne(id);
     await this.userAddressRepository.remove(userAddress);
   }
+
+  async findByUser(userId: number): Promise<UserAddress[]> {
+  return await this.userAddressRepository.find({
+    where: { userId },
+  });
+}
+
 }
