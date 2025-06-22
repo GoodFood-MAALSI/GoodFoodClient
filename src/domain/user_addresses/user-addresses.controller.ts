@@ -15,7 +15,7 @@ import { UserAddressesService } from './user-addresses.service';
 import { CreateUserAddressDto } from './dto/create-user-address.dto';
 import { UpdateUserAddressDto } from './dto/update-user-address.dto';
 import { AuthGuard } from 'node_modules/@nestjs/passport';
-import { ApiBody, ApiOperation } from 'node_modules/@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation } from 'node_modules/@nestjs/swagger';
 import { Request } from 'express';
 
 @Controller('user-addresses')
@@ -23,6 +23,7 @@ export class UserAddressesController {
   constructor(private readonly userAddressesService: UserAddressesService) {}
 
   @Get('me')
+  @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: "Récupérer les adresses de l'utilisateur connecté" })
   async getMyAddresses(@Req() req: Request) {
@@ -38,6 +39,7 @@ export class UserAddressesController {
   }
 
   @Post()
+  @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Ajouter une adresse' })
   @ApiBody({ type: CreateUserAddressDto })
@@ -72,11 +74,17 @@ export class UserAddressesController {
   }
 
   @Get(':id')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @ApiOperation({ summary: 'Récupérer une adresse' })
   async findOne(@Param('id') id: string) {
     return this.userAddressesService.findOne(+id);
   }
 
   @Patch(':id')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @ApiOperation({ summary: 'Mettre à jour une adresse' })
   async update(
     @Param('id') id: string,
     @Body() updateUserAddressDto: UpdateUserAddressDto,
@@ -85,6 +93,9 @@ export class UserAddressesController {
   }
 
   @Delete(':id')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @ApiOperation({ summary: 'Supprimer une adresse' })
   async remove(@Param('id') id: string) {
     return this.userAddressesService.remove(+id);
   }

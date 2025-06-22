@@ -15,7 +15,6 @@ import { Exclude } from "class-transformer";
 import { hashPassword } from "src/domain/utils/helpers";
 import { UserSearchHistory } from "src/domain/user_search_history/entities/user_search_history.entity";
 import { UserAddress } from "src/domain/user_addresses/entities/user-address.entity";
-import { Review } from "src/domain/reviews/entities/review.entity";
 
 export enum UserStatus {
   Active = "active",
