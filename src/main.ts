@@ -28,6 +28,7 @@ async function bootstrap() {
       whitelist: true,
       transform: true,
       forbidUnknownValues: false,
+      forbidNonWhitelisted: true,
     }),
   );
 
