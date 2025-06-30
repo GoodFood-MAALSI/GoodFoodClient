@@ -13,12 +13,16 @@ import {
 import { EntityHelper } from "src/domain/utils/entity-helper";
 import { Exclude } from "class-transformer";
 import { hashPassword } from "src/domain/utils/helpers";
-import { UserSearchHistory } from "src/domain/user_search_history/entities/user_search_history.entity";
 import { UserAddress } from "src/domain/user_addresses/entities/user-address.entity";
 
 export enum UserStatus {
   Active = "active",
   Inactive = "inactive",
+  Suspended = "suspended",
+}
+
+export enum UserRole {
+  Restaurateur = "client",
 }
 
 @Entity()
@@ -94,4 +98,7 @@ export class User extends EntityHelper {
 
   @OneToMany(() => UserAddress, (userAddress) => userAddress.user)
   userAddress: UserAddress[];
+
+  @Column({ type: "enum", enum: UserRole, default: UserRole.Restaurateur })
+  role: UserRole;
 }

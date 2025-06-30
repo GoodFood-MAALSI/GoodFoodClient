@@ -1,4 +1,4 @@
-import { User, UserStatus } from '../../domain/users/entities/user.entity';
+import { User, UserRole, UserStatus } from '../../domain/users/entities/user.entity';
 import { DataSource } from 'typeorm';
 import { Seeder } from 'typeorm-extension';
 
@@ -14,6 +14,7 @@ export class UserSeeder implements Seeder {
         status: UserStatus.Active,
         first_name: 'Antoine',
         last_name: 'Griezmann',
+        role: UserRole.Restaurateur,
         street_number: '12',
         street: 'Rue Faidherbe',
         city: 'Lille',
@@ -29,6 +30,7 @@ export class UserSeeder implements Seeder {
         status: UserStatus.Active,
         first_name: 'Paul',
         last_name: 'Pogba',
+        role: UserRole.Restaurateur,
         street_number: null,
         street: null,
         city: null,
@@ -44,6 +46,7 @@ export class UserSeeder implements Seeder {
         status: UserStatus.Active,
         first_name: 'Kylian',
         last_name: 'Mbappé',
+        role: UserRole.Restaurateur,
         street_number: '8',
         street: 'Rue de la Clef',
         city: 'Lille',
@@ -59,6 +62,7 @@ export class UserSeeder implements Seeder {
         status: UserStatus.Active,
         first_name: 'N\'Golo',
         last_name: 'Kanté',
+        role: UserRole.Restaurateur,
         street_number: '22',
         street: 'Boulevard Vauban',
         city: 'Lille',
@@ -74,6 +78,7 @@ export class UserSeeder implements Seeder {
         status: UserStatus.Active,
         first_name: 'Olivier',
         last_name: 'Giroud',
+        role: UserRole.Restaurateur,
         street_number: '17',
         street: 'Rue Nationale',
         city: 'Lille',
@@ -89,6 +94,7 @@ export class UserSeeder implements Seeder {
         status: UserStatus.Active,
         first_name: 'Hugo',
         last_name: 'Lloris',
+        role: UserRole.Restaurateur,
         street_number: '33',
         street: 'Rue du Molinel',
         city: 'Lille',
@@ -104,6 +110,7 @@ export class UserSeeder implements Seeder {
         status: UserStatus.Active,
         first_name: 'Raphaël',
         last_name: 'Varane',
+        role: UserRole.Restaurateur,
         street_number: '5',
         street: 'Place Rihour',
         city: 'Lille',
@@ -119,6 +126,7 @@ export class UserSeeder implements Seeder {
         status: UserStatus.Active,
         first_name: 'Ousmane',
         last_name: 'Dembélé',
+        role: UserRole.Restaurateur,
         street_number: '28',
         street: 'Rue Esquermoise',
         city: 'Lille',
@@ -134,6 +142,7 @@ export class UserSeeder implements Seeder {
         status: UserStatus.Active,
         first_name: 'Benjamin',
         last_name: 'Pavard',
+        role: UserRole.Restaurateur,
         street_number: '10',
         street: 'Rue de Gand',
         city: 'Lille',
@@ -149,6 +158,7 @@ export class UserSeeder implements Seeder {
         status: UserStatus.Active,
         first_name: 'Theo',
         last_name: 'Hernandez',
+        role: UserRole.Restaurateur,
         street_number: '19',
         street: 'Rue Solférino',
         city: 'Lille',
@@ -167,6 +177,7 @@ export class UserSeeder implements Seeder {
       user.status = userData.status;
       user.first_name = userData.first_name;
       user.last_name = userData.last_name;
+      user.role = userData.role;
       user.street_number = userData.street_number;
       user.street = userData.street;
       user.city = userData.city;
