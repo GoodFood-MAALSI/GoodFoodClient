@@ -6,6 +6,11 @@ import { ResponseInterceptor } from './domain/utils/interceptors/response.interc
 import { AllExceptionsFilter } from './domain/utils/filters/http-exception.filter';
 import { useContainer } from 'class-validator';
 import * as dotenv from 'dotenv';
+import { DataSource } from 'typeorm';
+import { runSeeders } from 'typeorm-extension';
+import { UserSeeder } from './database/seeders/user.seeder';
+import { UserAddressSeeder } from './database/seeders/user-adresses.seeder';
+import { UserSearchHistorySeeder } from './database/seeders/user-search-history.seeder';
 
 dotenv.config();
 
@@ -48,6 +53,26 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('swagger', app, document);
 
+  // Exécuter les seeders en environnement de développement si nécessaire
+  if (process.env.NODE_ENV === 'development' && process.env.RUN_SEEDERS === 'true') {
+    console.log('Running database seeders for client API...');
+    const dataSource = app.get(DataSource); // Récupérer la DataSource gérée par TypeOrmModule
+    try {
+      await runSeeders(dataSource, {
+        seeds: [
+          UserSeeder,
+          UserAddressSeeder,
+          UserSearchHistorySeeder,
+        ],
+      });
+      console.log('Seeders executed successfully for client API.');
+    } catch (error) {
+      console.error('Error running seeders for client API:', error);
+      throw error; // Ou gérer l'erreur selon tes besoins
+    }
+  }
+
   await app.listen(process.env.APP_PORT);
 }
+
 bootstrap();
