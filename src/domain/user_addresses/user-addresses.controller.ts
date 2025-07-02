@@ -14,8 +14,8 @@ import {
 import { UserAddressesService } from './user-addresses.service';
 import { CreateUserAddressDto } from './dto/create-user-address.dto';
 import { UpdateUserAddressDto } from './dto/update-user-address.dto';
-import { AuthGuard } from 'node_modules/@nestjs/passport';
-import { ApiBearerAuth, ApiBody, ApiOperation } from 'node_modules/@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
+import { ApiBearerAuth, ApiBody, ApiOperation } from '@nestjs/swagger';
 import { Request } from 'express';
 
 @Controller('user-addresses')

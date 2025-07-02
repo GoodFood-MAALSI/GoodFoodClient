@@ -10,8 +10,8 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { AuthGuard } from 'node_modules/@nestjs/passport';
-import { ApiBearerAuth, ApiBody, ApiOperation } from 'node_modules/@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
+import { ApiBearerAuth, ApiBody, ApiOperation } from '@nestjs/swagger';
 import { Request } from 'express';
 import { UserSearchHistoryService } from './user_search_history.service';
 import { CreateUserSearchHistoryDto } from './dto/create-user_search_history.dto';
