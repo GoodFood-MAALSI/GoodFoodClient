@@ -1,12 +1,11 @@
-import { IsString, IsNotEmpty } from '@nestjs/class-validator';
+import { IsString, IsNotEmpty, IsNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateUserAddressDto {
-
   @ApiProperty({
-    description: 'Intitulé de l\'adresse',
+    description: "Intitulé de l'adresse",
     example: 'Travail',
-    type: String
+    type: String,
   })
   @IsNotEmpty()
   @IsString()
@@ -15,7 +14,7 @@ export class CreateUserAddressDto {
   @ApiProperty({
     description: 'Le numéro de la rue (ex. "12bis")',
     example: '12bis',
-    type: String
+    type: String,
   })
   @IsNotEmpty()
   @IsString()
@@ -24,7 +23,7 @@ export class CreateUserAddressDto {
   @ApiProperty({
     description: 'Le nom de la rue',
     example: 'Rue des Lilas',
-    type: String
+    type: String,
   })
   @IsNotEmpty()
   @IsString()
@@ -33,7 +32,7 @@ export class CreateUserAddressDto {
   @ApiProperty({
     description: 'La ville',
     example: 'Paris',
-    type: String
+    type: String,
   })
   @IsNotEmpty()
   @IsString()
@@ -56,4 +55,22 @@ export class CreateUserAddressDto {
   @IsNotEmpty()
   @IsString()
   country: string;
+
+  @ApiProperty({
+    description: 'Longitude de l\'adresse (en degrés)',
+    example: 2.3522,
+    type: Number,
+  })
+  @IsNotEmpty()
+  @IsNumber()
+  long: number;
+
+  @ApiProperty({
+    description: 'Latitude de l\'adresse (en degrés)',
+    example: 48.8566,
+    type: Number,
+  })
+  @IsNotEmpty()
+  @IsNumber()
+  lat: number;
 }
