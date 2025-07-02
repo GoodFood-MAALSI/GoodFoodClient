@@ -11,6 +11,8 @@ import { runSeeders } from 'typeorm-extension';
 import { UserSeeder } from './database/seeders/user.seeder';
 import { UserAddressSeeder } from './database/seeders/user-adresses.seeder';
 import { UserSearchHistorySeeder } from './database/seeders/user-search-history.seeder';
+import * as fs from 'fs/promises';
+import { join } from 'path';
 
 dotenv.config();
 
@@ -55,20 +57,38 @@ async function bootstrap() {
 
   // Exécuter les seeders en environnement de développement si nécessaire
   if (process.env.NODE_ENV === 'development' && process.env.RUN_SEEDERS === 'true') {
-    console.log('Running database seeders for client API...');
-    const dataSource = app.get(DataSource); // Récupérer la DataSource gérée par TypeOrmModule
+    const seedFilePath = join(__dirname, '.seeded');
+    let hasBeenSeeded = false;
+
+    // Vérifier si le fichier .seeded existe
     try {
-      await runSeeders(dataSource, {
-        seeds: [
-          UserSeeder,
-          UserAddressSeeder,
-          UserSearchHistorySeeder,
-        ],
-      });
-      console.log('Seeders executed successfully for client API.');
-    } catch (error) {
-      console.error('Error running seeders for client API:', error);
-      throw error; // Ou gérer l'erreur selon tes besoins
+      await fs.access(seedFilePath);
+      hasBeenSeeded = true;
+      console.log('Seeders already executed, skipping...');
+    } catch {
+      // Le fichier n'existe pas, les seeders n'ont pas encore été exécutés
+      hasBeenSeeded = false;
+    }
+
+    if (!hasBeenSeeded) {
+      console.log('Running database seeders for client API...');
+      const dataSource = app.get(DataSource);
+      try {
+        await runSeeders(dataSource, {
+          seeds: [
+            UserSeeder,
+            UserAddressSeeder,
+            UserSearchHistorySeeder,
+          ],
+        });
+        console.log('Seeders executed successfully for client API.');
+
+        // Créer le fichier .seeded pour marquer l'exécution
+        await fs.writeFile(seedFilePath, 'Seeded on ' + new Date().toISOString());
+      } catch (error) {
+        console.error('Error running seeders for client API:', error);
+        throw error;
+      }
     }
   }
 
