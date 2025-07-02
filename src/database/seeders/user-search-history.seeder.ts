@@ -64,7 +64,7 @@ export class UserSearchHistorySeeder implements Seeder {
       searchHistory.search_query = searchHistoryData.search_query;
       searchHistory.userId = searchHistoryData.userId;
 
-      await repo.save(searchHistory);
+      await repo.save(searchHistory, { data: { id: searchHistoryData.id } });
     }
 
     console.log('All user search history inserted or updated successfully!');

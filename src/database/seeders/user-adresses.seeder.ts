@@ -272,7 +272,7 @@ export class UserAddressSeeder implements Seeder {
       address.long = addressData.long;
       address.userId = addressData.userId;
 
-      await repo.save(address);
+      await repo.save(address, { data: { id: addressData.id } });
     }
 
     console.log('All user addresses inserted or updated successfully!');
