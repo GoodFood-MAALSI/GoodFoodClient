@@ -22,7 +22,7 @@ export enum UserStatus {
 }
 
 export enum UserRole {
-  Restaurateur = "client",
+  Client = "client",
 }
 
 @Entity()
@@ -99,6 +99,6 @@ export class User extends EntityHelper {
   @OneToMany(() => UserAddress, (userAddress) => userAddress.user)
   userAddress: UserAddress[];
 
-  @Column({ type: "enum", enum: UserRole, default: UserRole.Restaurateur })
+  @Column({ type: "enum", enum: UserRole, default: UserRole.Client })
   role: UserRole;
 }
