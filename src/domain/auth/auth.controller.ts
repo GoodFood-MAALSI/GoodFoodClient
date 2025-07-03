@@ -18,9 +18,8 @@ import { NullableType } from 'src/domain/utils/types/nullable.type';
 import { User } from 'src/domain/users/entities/user.entity';
 import { AuthForgotPasswordDto } from './dtos/auth-forgot-password.dto';
 import { AuthResetPasswordDto } from './dtos/auth-reset-password.dto';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 
-@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(

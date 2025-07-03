@@ -13,7 +13,6 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import {
-  ApiTags,
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
@@ -28,7 +27,6 @@ import * as jwt from 'jsonwebtoken';
 import { Request } from 'express';
 import { Pagination } from '../utils/paginate';
 
-@ApiTags('Users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
