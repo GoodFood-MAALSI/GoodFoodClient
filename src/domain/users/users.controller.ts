@@ -1,3 +1,4 @@
+// client/src/users/users.controller.ts
 import {
   Controller,
   Get,
@@ -16,6 +17,8 @@ import {
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
+  ApiParam,
+  ApiTags,
 } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { UpdateUserDto } from './dtos/update-user.dto';
@@ -26,7 +29,9 @@ import { User, UserStatus } from './entities/user.entity';
 import * as jwt from 'jsonwebtoken';
 import { Request } from 'express';
 import { Pagination } from '../utils/paginate';
+import { BypassResponseWrapper } from '../utils/decorators/bypass-response-wrapper.decorator';
 
+@ApiTags('users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -39,7 +44,6 @@ export class UsersController {
     @Query() filterUsersDto: FilterUsersDto,
     @Req() req: Request,
   ): Promise<{ users: User[]; links: any; meta: any }> {
-
     try {
       const { users, total } = await this.usersService.findAllUsers(filterUsersDto);
       const { links, meta } = Pagination.generatePaginationMetadata(
@@ -65,7 +69,7 @@ export class UsersController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Récupérer un utilisateur par ID' })
-  @ApiResponse({ status: 200, description: 'Utilisateur trouvé' })
+  @ApiResponse({ status: 200, description: 'Utilisateur trouvé', type: User })
   @ApiResponse({ status: 403, description: 'Accès interdit' })
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé' })
   async findOne(
@@ -90,10 +94,36 @@ export class UsersController {
 
     const user = await this.usersService.findOneUser({ id: userId });
     if (!user) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      throw new HttpException('Utilisateur non trouvé', HttpStatus.NOT_FOUND);
     }
 
     return user;
+  }
+
+  @Get('interservice/:id')
+  @BypassResponseWrapper()
+  @ApiOperation({ summary: 'Récupérer les informations d’un client pour appels interservices' })
+  @ApiParam({ name: 'id', description: 'ID du client', type: Number })
+  @ApiResponse({ status: 200, description: 'Client récupéré avec succès', type: User })
+  @ApiResponse({ status: 400, description: 'ID invalide' })
+  @ApiResponse({ status: 404, description: 'Client non trouvé' })
+  async getClient(@Param('id') id: string): Promise<Partial<User>> {
+    const userId = parseInt(id);
+    if (isNaN(userId)) {
+      throw new HttpException('ID doit être un nombre', HttpStatus.BAD_REQUEST);
+    }
+
+    const user = await this.usersService.findOneUser({ id: userId });
+    if (!user) {
+      throw new HttpException('Client non trouvé', HttpStatus.NOT_FOUND);
+    }
+
+    return {
+      id: user.id,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      email: user.email,
+    };
   }
 
   @Patch(':id')
@@ -102,7 +132,7 @@ export class UsersController {
   @ApiOperation({
     summary: "Mettre à jour le prénom et/ou nom d'un utilisateur",
   })
-  @ApiResponse({ status: 200, description: 'Utilisateur mis à jour' })
+  @ApiResponse({ status: 200, description: 'Utilisateur mis à jour', type: User })
   @ApiResponse({ status: 403, description: 'Accès interdit' })
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé' })
   async update(
@@ -128,7 +158,7 @@ export class UsersController {
 
     const user = await this.usersService.findOneUser({ id: userId });
     if (!user) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      throw new HttpException('Utilisateur non trouvé', HttpStatus.NOT_FOUND);
     }
 
     const updatedUser = await this.usersService.updateUser(
@@ -172,20 +202,18 @@ export class UsersController {
     }
 
     const user = await this.usersService.findOneUser({ id: userId });
-    if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    if (!user) throw new HttpException('Utilisateur non trouvé', HttpStatus.NOT_FOUND);
 
     return this.usersService.deleteUser(userId);
   }
 
   @Patch(':id/suspend')
   @ApiOperation({ summary: 'Suspendre un utilisateur' })
-  @ApiResponse({ status: 200, description: 'Utilisateur suspendus avec succès' })
+  @ApiResponse({ status: 200, description: 'Utilisateur suspendu avec succès' })
   @ApiResponse({ status: 403, description: 'Accès interdit' })
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé' })
   @ApiResponse({ status: 400, description: 'Utilisateur déjà suspendu' })
-  async suspend(
-    @Param('id') id: string
-  ): Promise<{ message: string }> {
+  async suspend(@Param('id') id: string): Promise<{ message: string }> {
     const userId = +id;
 
     const user = await this.usersService.findOneUser({ id: userId });
@@ -201,18 +229,16 @@ export class UsersController {
     }
 
     await this.usersService.suspendUser(userId);
-    return { message: 'Utilisateur suspendus avec succès' };
+    return { message: 'Utilisateur suspendu avec succès' };
   }
 
   @Patch(':id/restore')
   @ApiOperation({ summary: 'Réactiver un utilisateur' })
-  @ApiResponse({ status: 200, description: 'Utilisateur réactivés avec succès' })
+  @ApiResponse({ status: 200, description: 'Utilisateur réactivé avec succès' })
   @ApiResponse({ status: 403, description: 'Accès interdit' })
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé' })
   @ApiResponse({ status: 400, description: 'Utilisateur non suspendu' })
-  async restore(
-    @Param('id') id: string
-  ): Promise<{ message: string }> {
+  async restore(@Param('id') id: string): Promise<{ message: string }> {
     const userId = +id;
 
     const user = await this.usersService.findOneUser({ id: userId });
@@ -228,7 +254,7 @@ export class UsersController {
     }
 
     await this.usersService.restoreUser(userId);
-    return { message: 'Utilisateur réactivés avec succès' };
+    return { message: 'Utilisateur réactivé avec succès' };
   }
 
   @Get('/verify/:userId')
@@ -239,19 +265,15 @@ export class UsersController {
   @ApiResponse({ status: 401, description: 'Non autorisé' })
   @ApiResponse({ status: 403, description: 'Rôle invalide' })
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé' })
-  async verifyClient(@Param('userId') userId: string, @Req() req) {
-
-    // Récupérer le token depuis l'en-tête Authorization
+  async verifyClient(@Param('userId') userId: string, @Req() req: Request) {
     const token = req.headers['authorization']?.split(' ')[1];
     if (!token) {
       throw new HttpException('Token manquant', HttpStatus.UNAUTHORIZED);
     }
 
     try {
-      // Valider le token avec la clé secrète
-      let decoded: any = null;
       const secret = process.env.AUTH_JWT_SECRET;
-      decoded = jwt.verify(token, secret);
+      const decoded = jwt.verify(token, secret) as any;
       const authUserId = decoded.id?.toString();
       const authRole = decoded.role;
 
