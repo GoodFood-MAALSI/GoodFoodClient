@@ -19,6 +19,7 @@ import {
   ApiBearerAuth,
   ApiParam,
   ApiTags,
+  ApiExcludeEndpoint,
 } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { UpdateUserDto } from './dtos/update-user.dto';
@@ -31,7 +32,6 @@ import { Request } from 'express';
 import { Pagination } from '../utils/paginate';
 import { BypassResponseWrapper } from '../utils/decorators/bypass-response-wrapper.decorator';
 
-@ApiTags('users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -101,6 +101,7 @@ export class UsersController {
   }
 
   @Get('interservice/:id')
+  @ApiExcludeEndpoint()
   @BypassResponseWrapper()
   @ApiOperation({ summary: 'Récupérer les informations d’un client pour appels interservices' })
   @ApiParam({ name: 'id', description: 'ID du client', type: Number })
