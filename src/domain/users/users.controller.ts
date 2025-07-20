@@ -1,4 +1,3 @@
-// client/src/users/users.controller.ts
 import {
   Controller,
   Get,
@@ -31,12 +30,15 @@ import * as jwt from 'jsonwebtoken';
 import { Request } from 'express';
 import { Pagination } from '../utils/paginate';
 import { BypassResponseWrapper } from '../utils/decorators/bypass-response-wrapper.decorator';
+import { InterserviceAuthGuardFactory } from '../interservice/guards/interservice-auth.guard';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
+  @UseGuards(InterserviceAuthGuardFactory(['super-admin', 'admin']))
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Récupérer tous les utilisateurs' })
   @ApiResponse({ status: 200, description: 'Liste des utilisateurs' })
   @ApiResponse({ status: 403, description: 'Accès interdit' })
@@ -66,8 +68,8 @@ export class UsersController {
   }
 
   @Get(':id')
+  @UseGuards(InterserviceAuthGuardFactory(['super-admin', 'admin' , 'client']))
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Récupérer un utilisateur par ID' })
   @ApiResponse({ status: 200, description: 'Utilisateur trouvé', type: User })
   @ApiResponse({ status: 403, description: 'Accès interdit' })
@@ -128,8 +130,8 @@ export class UsersController {
   }
 
   @Patch(':id')
+  @UseGuards(InterserviceAuthGuardFactory(['client']))
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({
     summary: "Mettre à jour le prénom et/ou nom d'un utilisateur",
   })
@@ -170,8 +172,8 @@ export class UsersController {
   }
 
   @Delete(':id')
+  @UseGuards(InterserviceAuthGuardFactory(['client']))
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Supprimer définitivement un utilisateur' })
   @ApiResponse({
     status: 200,
@@ -209,6 +211,8 @@ export class UsersController {
   }
 
   @Patch(':id/suspend')
+  @UseGuards(InterserviceAuthGuardFactory(['super-admin', 'admin']))
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Suspendre un utilisateur' })
   @ApiResponse({ status: 200, description: 'Utilisateur suspendu avec succès' })
   @ApiResponse({ status: 403, description: 'Accès interdit' })
@@ -234,6 +238,8 @@ export class UsersController {
   }
 
   @Patch(':id/restore')
+  @UseGuards(InterserviceAuthGuardFactory(['super-admin', 'admin']))
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Réactiver un utilisateur' })
   @ApiResponse({ status: 200, description: 'Utilisateur réactivé avec succès' })
   @ApiResponse({ status: 403, description: 'Accès interdit' })
@@ -299,5 +305,6 @@ export class UsersController {
     } catch (err) {
       throw new HttpException('Erreur de validation du token', HttpStatus.UNAUTHORIZED);
     }
+    
   }
 }

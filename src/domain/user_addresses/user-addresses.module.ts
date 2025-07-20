@@ -5,13 +5,16 @@ import { UserAddress } from './entities/user-address.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from 'src/domain/users/users.module';
 import { IsEntityExistsConstraint } from '../utils/validators/is-entity-exists.validator';
+import { HttpModule } from '@nestjs/axios';
+import { InterserviceAuthGuard } from '../interservice/guards/interservice-auth.guard';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([UserAddress]),
     UsersModule,
+    HttpModule
   ],
   controllers: [UserAddressesController],
-  providers: [IsEntityExistsConstraint, UserAddressesService],
+  providers: [IsEntityExistsConstraint, UserAddressesService, InterserviceAuthGuard],
 })
 export class UserAddressesModule {}

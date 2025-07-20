@@ -14,17 +14,17 @@ import {
 import { UserAddressesService } from './user-addresses.service';
 import { CreateUserAddressDto } from './dto/create-user-address.dto';
 import { UpdateUserAddressDto } from './dto/update-user-address.dto';
-import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiBody, ApiOperation } from '@nestjs/swagger';
 import { Request } from 'express';
+import { InterserviceAuthGuardFactory } from '../interservice/guards/interservice-auth.guard';
 
 @Controller('user-addresses')
 export class UserAddressesController {
   constructor(private readonly userAddressesService: UserAddressesService) {}
 
   @Get('me')
+  @UseGuards(InterserviceAuthGuardFactory(['client']))
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: "Récupérer les adresses de l'utilisateur connecté" })
   async getMyAddresses(@Req() req: Request) {
     const user = req.user;
@@ -39,8 +39,8 @@ export class UserAddressesController {
   }
 
   @Post()
+  @UseGuards(InterserviceAuthGuardFactory(['client']))
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Ajouter une adresse' })
   @ApiBody({ type: CreateUserAddressDto })
   async create(
@@ -56,16 +56,16 @@ export class UserAddressesController {
         );
       }
 
-      const createdAdress = await this.userAddressesService.create({
-        ...createUserAddressDto,
-        userId: user.id,
-      });
+      const createdAddress = await this.userAddressesService.create(
+        createUserAddressDto,
+        user.id,
+      );
 
-      return createdAdress;
+      return createdAddress;
     } catch (error) {
       throw new HttpException(
         {
-          message: 'Failed to create restaurant',
+          message: "Échec de la création de l'adresse",
           error: error.message,
         },
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -74,29 +74,113 @@ export class UserAddressesController {
   }
 
   @Get(':id')
+  @UseGuards(InterserviceAuthGuardFactory(['client']))
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Récupérer une adresse' })
-  async findOne(@Param('id') id: string) {
-    return this.userAddressesService.findOne(+id);
+  async findOne(@Param('id') id: string, @Req() req: Request) {
+    try {
+      const addressId = parseInt(id);
+      if (isNaN(addressId)) {
+        throw new HttpException('ID invalide', HttpStatus.BAD_REQUEST);
+      }
+
+      const user = req.user;
+      if (!user || !user.id) {
+        throw new HttpException(
+          'Utilisateur non authentifié',
+          HttpStatus.UNAUTHORIZED,
+        );
+      }
+
+      return await this.userAddressesService.findOne(addressId, user.id);
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new HttpException(
+        {
+          message: "Échec de la récupération de l'adresse",
+          error: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   @Patch(':id')
+  @UseGuards(InterserviceAuthGuardFactory(['client']))
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Mettre à jour une adresse' })
   async update(
     @Param('id') id: string,
     @Body() updateUserAddressDto: UpdateUserAddressDto,
+    @Req() req: Request,
   ) {
-    return this.userAddressesService.update(+id, updateUserAddressDto);
+    try {
+      const addressId = parseInt(id);
+      if (isNaN(addressId)) {
+        throw new HttpException('ID invalide', HttpStatus.BAD_REQUEST);
+      }
+
+      const user = req.user;
+      if (!user || !user.id) {
+        throw new HttpException(
+          'Utilisateur non authentifié',
+          HttpStatus.UNAUTHORIZED,
+        );
+      }
+
+      return await this.userAddressesService.update(
+        addressId,
+        updateUserAddressDto,
+        user.id,
+      );
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new HttpException(
+        {
+          message: "Échec de la mise à jour de l'adresse",
+          error: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   @Delete(':id')
+  @UseGuards(InterserviceAuthGuardFactory(['client']))
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Supprimer une adresse' })
-  async remove(@Param('id') id: string) {
-    return this.userAddressesService.remove(+id);
+  async remove(@Param('id') id: string, @Req() req: Request) {
+    try {
+      const addressId = parseInt(id);
+      if (isNaN(addressId)) {
+        throw new HttpException('ID invalide', HttpStatus.BAD_REQUEST);
+      }
+
+      const user = req.user;
+      if (!user || !user.id) {
+        throw new HttpException(
+          'Utilisateur non authentifié',
+          HttpStatus.UNAUTHORIZED,
+        );
+      }
+
+      await this.userAddressesService.remove(addressId, user.id);
+      return { message: 'Adresse supprimée avec succès' };
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new HttpException(
+        {
+          message: "Échec de la suppression de l'adresse",
+          error: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }
