@@ -73,7 +73,7 @@ export class InterserviceAuthGuard implements CanActivate {
 
       // Mappage des rôles vers leurs services respectifs
       const roleToServiceMap: Record<string, string> = {
-        restaurateur: 'restaurateur-service.restaurateur.svc.cluster.local:3001/users',
+        restaurateur: 'restaurateur-service.restaurateur.svc.cluster.local:3002/users',
         'super-admin':
           'administrateur-service.administrateur.svc.cluster.local:3004/users',
         admin:
